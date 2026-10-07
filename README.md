@@ -3,7 +3,6 @@
 # ⚡ Superconductor Critical Temperature ($T_c$) Predictor
 ### *Advanced MLOps Pipeline with FastAPI, Streamlit, Docker & AWS EC2*
 
-[![CI/CD Pipeline](https://github.com/iamsoumyamishra7/superconductor-mlops/actions/workflows/deploy.yml/badge.svg)](https://github.com/iamsoumyamishra7/superconductor-mlops/actions)
 [![Python 3.10](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-005571?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-UI-FF4B4B?logo=streamlit)](https://streamlit.io/)

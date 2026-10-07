@@ -12,8 +12,8 @@ st.set_page_config(page_title="Superconductivity Tc Predictor", page_icon="⚡",
 if 'history' not in st.session_state:
     st.session_state.history = []
 
-if 'api_url' not in st.session_state:
-    st.session_state.api_url = os.getenv("FASTAPI_URL", "http://13.238.135.224:8000")
+if 'fastapi_endpoint_url' not in st.session_state:
+    st.session_state.fastapi_endpoint_url = os.getenv("FASTAPI_URL", "http://13.238.135.224:8000")
 
 # Custom CSS for glowing UI
 st.markdown("""
@@ -34,8 +34,8 @@ with st.sidebar:
     st.markdown("## ⚡ Core AI Engine")
     st.markdown("---")
     
-    # Bound with session state key to prevent resetting
-    api_url = st.text_input("FastAPI Endpoint", key="api_url", help="Enter the FastAPI server URL.")
+    # New unique key to prevent browser caching old localhost state
+    api_url = st.text_input("FastAPI Endpoint", key="fastapi_endpoint_url", help="Enter the FastAPI server URL.")
     
     if st.button("🔄 Ping Backend Server"):
         try:
