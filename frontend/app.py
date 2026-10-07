@@ -8,9 +8,12 @@ import plotly.express as px
 # 1. Page Configuration
 st.set_page_config(page_title="Superconductivity Tc Predictor", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
 
-# Initialize Session State for History
+# Initialize Session State for History and API URL
 if 'history' not in st.session_state:
     st.session_state.history = []
+
+if 'api_url' not in st.session_state:
+    st.session_state.api_url = os.getenv("FASTAPI_URL", "http://13.238.135.224:8000")
 
 # Custom CSS for glowing UI
 st.markdown("""
@@ -26,14 +29,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Default backend URL from environment or fallback to EC2 public IP
-DEFAULT_API_URL = os.getenv("FASTAPI_URL", "http://13.238.135.224:8000")
-
 # 2. Sidebar
 with st.sidebar:
     st.markdown("## ⚡ Core AI Engine")
     st.markdown("---")
-    api_url = st.text_input("FastAPI Endpoint", value=DEFAULT_API_URL, help="Enter the FastAPI server URL.")
+    
+    # Bound with session state key to prevent resetting
+    api_url = st.text_input("FastAPI Endpoint", key="api_url", help="Enter the FastAPI server URL.")
     
     if st.button("🔄 Ping Backend Server"):
         try:
