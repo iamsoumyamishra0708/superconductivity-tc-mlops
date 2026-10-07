@@ -1,0 +1,72 @@
+name: MLOps Docker Hub to EC2 Pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE: iamsoumyamishra7/superconductor-mlops
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.build-image.outputs.image_tag }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        id: build-image
+        env:
+          IMAGE_TAG: ${{ github.sha }} 
+        run: |
+          docker build -t $DOCKER_IMAGE:$IMAGE_TAG -t $DOCKER_IMAGE:latest .
+          docker push $DOCKER_IMAGE:$IMAGE_TAG
+          docker push $DOCKER_IMAGE:latest
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose.yml to EC2
+        uses: appleboy/scp-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "/home/${{ secrets.EC2_USERNAME }}/"
+
+      - name: SSH into EC2 and Deploy via Docker Compose
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+          DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: IMAGE_TAG,DOCKER_IMAGE
+          script: |
+            export IMAGE_TAG=$IMAGE_TAG
+            export DOCKER_IMAGE=$DOCKER_IMAGE
+            
+            # Docker Hub login on EC2 (if private repo, optional for public)
+            # echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            
+            docker-compose pull
+            docker-compose up -d --remove-orphans
+            
+            docker image prune -f

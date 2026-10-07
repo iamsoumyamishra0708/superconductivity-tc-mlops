@@ -1,0 +1,22 @@
+artifact_path: file:D:/DATA SCIENCE/superconductivity-tc/mlruns/1/models/m-7a9bbb5b3a9a477ea448cd5f99f9871a/artifacts
+flavors:
+  python_function:
+    data: model.ubj
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.14.5
+  xgboost:
+    code: null
+    data: model.ubj
+    model_class: xgboost.sklearn.XGBRegressor
+    model_format: ubj
+    xgb_version: 3.4.1
+mlflow_version: 3.16.1
+model_id: m-7a9bbb5b3a9a477ea448cd5f99f9871a
+model_size_bytes: 450213
+model_uuid: m-7a9bbb5b3a9a477ea448cd5f99f9871a
+prompts: null
+run_id: 8ab1c8b362454faab4eb8959aff572f7
+utc_time_created: '2026-10-06 16:02:01.750602'
