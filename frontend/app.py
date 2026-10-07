@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import requests
 import pandas as pd
@@ -25,17 +26,23 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Default backend URL from environment or fallback to EC2 public IP
+DEFAULT_API_URL = os.getenv("FASTAPI_URL", "http://13.238.135.224:8000")
+
 # 2. Sidebar
 with st.sidebar:
     st.markdown("## ⚡ Core AI Engine")
     st.markdown("---")
-    api_url = st.text_input("FastAPI Endpoint", value="http://13.238.135.224:8000", help="Enter the FastAPI server URL.")
+    api_url = st.text_input("FastAPI Endpoint", value=DEFAULT_API_URL, help="Enter the FastAPI server URL.")
     
     if st.button("🔄 Ping Backend Server"):
         try:
             r = requests.get(f"{api_url}/health")
-            st.success("API is Online! 🟢") if r.status_code == 200 else st.error("API Error 🔴")
-        except:
+            if r.status_code == 200:
+                st.success("API is Online! 🟢")
+            else:
+                st.error("API Error 🔴")
+        except Exception:
             st.error("Server Unreachable 🔴")
 
     st.markdown("---")
@@ -55,7 +62,7 @@ def fetch_features(base_url):
     try:
         res = requests.get(f"{base_url}/features")
         return res.json().get("expected_features", []) if res.status_code == 200 else []
-    except:
+    except Exception:
         return []
 
 expected_features = fetch_features(api_url)
@@ -72,8 +79,10 @@ else:
 
     # Multiplier Logic
     multiplier = 0.5
-    if "Low" in preset_choice: multiplier = 0.1
-    elif "High" in preset_choice: multiplier = 1.8
+    if "Low" in preset_choice:
+        multiplier = 0.1
+    elif "High" in preset_choice:
+        multiplier = 1.8
     features_payload = {f: multiplier for f in expected_features}
 
     # Tabs
@@ -139,12 +148,10 @@ else:
         
         c1, c2 = st.columns(2)
         with c1:
-            # Bar Chart
             chart_data = pd.DataFrame({"Feature Name": top_15_features, "Value": [features_payload[f] for f in top_15_features]}).set_index("Feature Name")
             st.bar_chart(chart_data)
             
         with c2:
-            # Radar Chart
             df_radar = pd.DataFrame(dict(r=[features_payload[f] for f in top_15_features], theta=top_15_features))
             fig_radar = px.line_polar(df_radar, r='r', theta='theta', line_close=True)
             fig_radar.update_traces(fill='toself', line_color='#4ade80')
@@ -158,7 +165,6 @@ else:
             history_df = pd.DataFrame(st.session_state.history)
             st.dataframe(history_df, use_container_width=True)
             
-            # Download Button
             csv = history_df.to_csv(index=False).encode('utf-8')
             st.download_button(label="📥 Download Report as CSV", data=csv, file_name='superconductor_predictions.csv', mime='text/csv')
         else:
