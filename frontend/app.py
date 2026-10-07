@@ -29,7 +29,7 @@ st.markdown("""
 with st.sidebar:
     st.markdown("## ⚡ Core AI Engine")
     st.markdown("---")
-    api_url = st.text_input("FastAPI Endpoint", value="http://127.0.0.1:8000")
+    api_url = st.text_input("FastAPI Endpoint", value="http://13.238.135.224:8000", help="Enter the FastAPI server URL.")
     
     if st.button("🔄 Ping Backend Server"):
         try:
@@ -87,7 +87,7 @@ else:
             with st.expander("🔍 View Full JSON Matrix", expanded=False):
                 st.json(features_payload)
             st.markdown("<br>", unsafe_allow_html=True)
-            predict_btn = st.button("🧠 Execute AI Prediction", type="primary", width='stretch')
+            predict_btn = st.button("🧠 Execute AI Prediction", type="primary", use_container_width=True)
 
         with right_col:
             st.subheader("🎯 Inference Output")
@@ -118,7 +118,7 @@ else:
                                 }
                             ))
                             fig_gauge.update_layout(paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, height=300, margin=dict(l=20, r=20, t=50, b=20))
-                            st.plotly_chart(fig_gauge, width='stretch')
+                            st.plotly_chart(fig_gauge, use_container_width=True)
                             
                             if tc_result > 40:
                                 st.balloons()
@@ -149,14 +149,14 @@ else:
             fig_radar = px.line_polar(df_radar, r='r', theta='theta', line_close=True)
             fig_radar.update_traces(fill='toself', line_color='#4ade80')
             fig_radar.update_layout(paper_bgcolor="rgba(0,0,0,0)", polar=dict(bgcolor="rgba(0,0,0,0)", radialaxis=dict(visible=True, color="white")), font_color="white", height=350)
-            st.plotly_chart(fig_radar, width='stretch')
+            st.plotly_chart(fig_radar, use_container_width=True)
 
     # --- TAB 3: Execution History ---
     with tab3:
         st.subheader("📜 Session Prediction Log")
         if st.session_state.history:
             history_df = pd.DataFrame(st.session_state.history)
-            st.dataframe(history_df, width='stretch')
+            st.dataframe(history_df, use_container_width=True)
             
             # Download Button
             csv = history_df.to_csv(index=False).encode('utf-8')
