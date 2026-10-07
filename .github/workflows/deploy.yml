@@ -50,7 +50,7 @@ jobs:
           target: "/home/${{ secrets.EC2_USERNAME }}/"
 
       - name: SSH into EC2 and Deploy via Docker Compose
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@master
         env:
           IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
           DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
@@ -63,9 +63,7 @@ jobs:
             export IMAGE_TAG=$IMAGE_TAG
             export DOCKER_IMAGE=$DOCKER_IMAGE
             
-            # Docker Hub login on EC2 (if private repo, optional for public)
-            # echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-            
+            cd /home/ubuntu
             docker-compose pull
             docker-compose up -d --remove-orphans
             
